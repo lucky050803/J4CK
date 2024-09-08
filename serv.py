@@ -1,8 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import time
+import ollama
+
+
+
 
 app = Flask(__name__)
-
 # Mot de passe défini
 PASSWORD = "oui"
 # Dictionnaire pour stocker le nombre de tentatives échouées par IP
@@ -55,10 +58,13 @@ def home():
     if request.method == 'POST' and 'phrase' in request.form:
         phrase = request.form['phrase']
         # Logique de réponse
-        if phrase == "OK":
-            response = "elle a la degaine"
-        else:
-            response = phrase
+        response = ollama.chat(model = 'tinyllama1.1', messages=[
+            {
+                'role': 'user',
+                'content': phrase
+            },
+        ])
+        response=str(response['message']['content'])
     return render_template('home.html', response=response)
 
 if __name__ == '__main__':
